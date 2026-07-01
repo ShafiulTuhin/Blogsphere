@@ -9,14 +9,7 @@ const loginUser = catchAsync(
     const payload = req.body;
 
     const result = await authService.loginUserService(payload);
-    // console.log(result.accessToken);
 
-    // res.cookie("accessToken", result.accessToken, {
-    //   httpOnly: true,
-    //   secure: false,
-    //   sameSite: "none",
-    //   maxAge: 1000 * 60 * 60 * 24, // 24 hours
-    // });
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
       secure: false,
