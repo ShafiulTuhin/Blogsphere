@@ -1,4 +1,15 @@
-const createPost = () => {};
+import { prisma } from "../../lib/prisma";
+import { ICreatePostsPayload } from "./post.interface";
+
+const createPost = async (payload: ICreatePostsPayload, userId: string) => {
+  const result = await prisma.post.create({
+    data: {
+      ...payload,
+      authorId: userId,
+    },
+  });
+  return result;
+};
 const getAllPosts = () => {};
 const getPostById = () => {};
 const updatePost = () => {};
