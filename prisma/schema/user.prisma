@@ -1,23 +1,26 @@
 model User {
-    id String @id @default(uuid())
-    name String @db.VarChar(255)
-    email String @unique
-    password String
-    activeStatus ActiveStatus @default(ACTIVE)
-    role Role @default(USER)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
-    profile Profile?
+  id           String       @id @default(uuid())
+  name         String       @db.VarChar(255)
+  email        String       @unique
+  password     String
+  activeStatus ActiveStatus @default(ACTIVE)
+  role         Role         @default(USER)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now())
+  profile      Profile?
+  comments     Comment[]
+  posts        Post[]
 
-    @@map("users")
+  @@map("users")
 }
 
-enum ActiveStatus{
-    ACTIVE
-    BLOCKED
+enum ActiveStatus {
+  ACTIVE
+  BLOCKED
 }
-enum Role{
-    USER
-    AUTHOR
-    ADMIN
+
+enum Role {
+  USER
+  AUTHOR
+  ADMIN
 }
