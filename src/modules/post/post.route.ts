@@ -19,7 +19,7 @@ router.get(
 
 router.get("/:postId", postController.getPostById);
 router.patch(
-  "/postId",
+  "/:postId",
   auth(Role.USER, Role.AUTHOR, Role.ADMIN),
   postController.updatePost,
 );

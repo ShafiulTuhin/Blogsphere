@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { ICreatePostsPayload } from "./post.interface";
+import { ICreatePostsPayload, IUpdatePostsPayload } from "./post.interface";
 
 const createPost = async (payload: ICreatePostsPayload, userId: string) => {
   const result = await prisma.post.create({
@@ -75,8 +75,49 @@ const getMyPosts = async (authorId: string) => {
   });
   return posts;
 };
-const updatePost = () => {};
-const deletePost = () => {};
+const updatePost = async (
+  postId: string,
+  payload: IUpdatePostsPayload,
+  authorId: string,
+  isAdmin: boolean,
+) => {
+  const post = await prisma.post.findUniqueOrThrow({
+    where: {
+      id: postId,
+    },
+  });
+  if (!isAdmin && post.authorId !== authorId) {
+    throw new Error("Permission denied");
+  }
+
+  const updatedPost = await prisma.post.update({
+    where: {
+      id: postId,
+    },
+    data: payload,
+  });
+  return updatedPost;
+};
+const deletePost = async (
+  postId: string,
+
+  authorId: string,
+  isAdmin: boolean,
+) => {
+  const post = await prisma.post.findUniqueOrThrow({
+    where: {
+      id: postId,
+    },
+  });
+  if (!isAdmin && post.authorId !== authorId) {
+    throw new Error("Permission denied");
+  }
+  await prisma.post.delete({
+    where: {
+      id: postId,
+    },
+  });
+};
 const getPostsStats = () => {};
 
 export const postService = {
