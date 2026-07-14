@@ -10,8 +10,71 @@ const createPost = async (payload: ICreatePostsPayload, userId: string) => {
   });
   return result;
 };
-const getAllPosts = () => {};
-const getPostById = () => {};
+const getAllPosts = async () => {
+  const posts = await prisma.post.findMany({
+    include: {
+      author: {
+        omit: {
+          password: true,
+        },
+      },
+      comments: true,
+    },
+  });
+  return posts;
+};
+const getPostById = async (postId: string) => {
+  const post = await prisma.post.findUniqueOrThrow({
+    where: {
+      id: postId,
+    },
+  });
+
+  const updatedPost = await prisma.post.update({
+    where: {
+      id: postId,
+    },
+    data: {
+      views: {
+        increment: 1,
+      },
+    },
+    include: {
+      author: {
+        omit: {
+          password: true,
+        },
+      },
+      comments: true,
+    },
+  });
+  return updatedPost;
+};
+
+const getMyPosts = async (authorId: string) => {
+  const posts = await prisma.post.findMany({
+    where: {
+      authorId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      comments: true,
+      author: {
+        omit: {
+          password: true,
+        },
+      },
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
+  });
+  return posts;
+};
 const updatePost = () => {};
 const deletePost = () => {};
 const getPostsStats = () => {};
@@ -20,6 +83,7 @@ export const postService = {
   createPost,
   getAllPosts,
   getPostById,
+  getMyPosts,
   updatePost,
   deletePost,
   getPostsStats,
