@@ -10,7 +10,7 @@ router.post(
   postController.createPost,
 );
 router.get("/", postController.getAllPosts);
-
+router.get("/stats", auth(Role.ADMIN), postController.getPostsStats);
 router.get(
   "/my-posts",
   auth(Role.USER, Role.AUTHOR, Role.ADMIN),
@@ -28,5 +28,5 @@ router.delete(
   auth(Role.USER, Role.AUTHOR, Role.ADMIN),
   postController.deletePost,
 );
-router.get("/stats", auth(Role.ADMIN), postController.getPostsStats);
+
 export const postRoutes = router;
