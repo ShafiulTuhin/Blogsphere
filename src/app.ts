@@ -16,6 +16,7 @@ import { commentRoutes } from "./modules/comment/comment.route";
 import { notFound } from "./middlewares/notFound";
 import httpStatus from "http-status";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
+import { subscriptionRoutes } from "./modules/subscription/subscription.route";
 
 const app: Application = express();
 
@@ -32,6 +33,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/subscription", subscriptionRoutes);
 
 app.use(notFound);
 app.use(globalErrorHandler);

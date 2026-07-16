@@ -6,10 +6,15 @@ user User @relation(fields: [userId], references: [id],onDelete: Cascade)
 
 currentPeriodEnd DateTime
 status SubscriptionStatus @default(ACTIVE)
+
+
+  //stripe customer id
+    stripeCustomerId String @unique
+
 createdAt DateTime @default(now())
 updatedAt DateTime @default(now())
 
-@@map ("subscriptions")
+@@map("subscriptions")
 
 }
 
