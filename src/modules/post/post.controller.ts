@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { postService } from "./post.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import { IPostQuery } from "./post.interface";
 
 const createPost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -22,7 +23,10 @@ const createPost = catchAsync(
 
 const getAllPosts = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const posts = await postService.getAllPosts();
+    const query = req.query;
+    console.log(query);
+
+    const posts = await postService.getAllPosts(query);
 
     sendResponse(res, {
       success: true,
