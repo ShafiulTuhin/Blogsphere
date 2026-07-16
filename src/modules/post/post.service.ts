@@ -1,4 +1,5 @@
 import { CommentStatus, PostStatus } from "../../../generated/prisma/enums";
+import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 import {
   ICreatePostsPayload,
@@ -15,6 +16,7 @@ const createPost = async (payload: ICreatePostsPayload, userId: string) => {
   });
   return result;
 };
+
 const getAllPosts = async (query: IPostQuery) => {
   const limit = query.limit ? Number(query.limit) : 10;
   const page = query.page ? Number(query.page) : 1;
@@ -22,101 +24,62 @@ const getAllPosts = async (query: IPostQuery) => {
 
   const sortBy = query.sortBy ? query.sortBy : "createdAt";
   const sortOrder = query.sortOrder ? query.sortOrder : "desc";
-  const posts = await prisma.post.findMany({
-    // searching (OR)
-    // where: {
-    //   OR: [
-    //     {
-    //       title: {
-    //         contains: "post",
-    //         mode: "insensitive",
-    //       },
-    //     },
-    //     {
-    //       content: {
-    //         contains: "mern",
-    //         mode: "insensitive",
-    //       },
-    //     },
-    //   ],
-    // },
-    // filtering(AND) and searching(OR) Combine using
-    // where: {
-    //   AND: [
-    //     {
-    //       // Searching
-    //       OR: [
-    //         {
-    //           title: {
-    //             contains: "post",
-    //             mode: "insensitive",
-    //           },
-    //         },
-    //         {
-    //           content: {
-    //             contains: "mern",
-    //             mode: "insensitive",
-    //           },
-    //         },
-    //       ],
-    //     },
-    //     // Filtering
-    //     {
-    //       title: {
-    //         contains: "updated",
-    //         mode: "insensitive",
-    //       },
-    //     },
-    //     {
-    //       content: {
-    //         contains: "ve",
-    //         mode: "insensitive",
-    //       },
-    //     },
-    //   ],
-    // },
 
-    // Dynamic searching,filtering and pagination:
-    where: {
-      AND: [
-        query.searchTerm
-          ? {
-              OR: [
-                {
-                  title: {
-                    contains: query.searchTerm,
-                    mode: "insensitive",
-                  },
-                },
-                {
-                  content: {
-                    contains: query.searchTerm,
-                    mode: "insensitive",
-                  },
-                },
-              ],
-            }
-          : {},
+  const tags = query.tags ? JSON.parse(query.tags as string) : null;
+  const tagsArray = Array.isArray(tags) ? tags : [];
 
-        query.title
-          ? {
-              title: {
-                contains: query.title,
-                mode: "insensitive",
-              },
-            }
-          : {},
-        query.content
-          ? {
-              content: {
-                contains: query.content,
-                mode: "insensitive",
-              },
-            }
-          : {},
+  const andConditions: PostWhereInput[] = [];
+
+  if (query.searchTerm) {
+    andConditions.push({
+      OR: [
+        {
+          title: {
+            contains: query.searchTerm,
+            mode: "insensitive",
+          },
+        },
+        {
+          content: {
+            contains: query.searchTerm,
+            mode: "insensitive",
+          },
+        },
       ],
-    },
+    });
+  }
 
+  if (query.title) {
+    andConditions.push({
+      title: {
+        contains: query.title as string,
+        mode: "insensitive",
+      },
+    });
+  }
+
+  if (query.content) {
+    andConditions.push({
+      content: {
+        contains: query.content as string,
+        mode: "insensitive",
+      },
+    });
+  }
+
+  if (query.tags) {
+    andConditions.push({
+      tags: {
+        hasSome: tagsArray,
+      },
+    });
+  }
+  const posts = await prisma.post.findMany({
+    // Dynamic searching,filtering:
+    where: {
+      AND: andConditions,
+    },
+    // Dynamic pagination and sorting:
     take: limit,
     skip: skip,
     orderBy: {
