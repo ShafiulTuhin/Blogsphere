@@ -34,7 +34,6 @@ app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 
 app.use(notFound);
-
 app.use(globalErrorHandler);
 
 export default app;
